@@ -24,6 +24,7 @@
     "chokidar-socket-emitter": "0.6.0",
     "core-js": "2.5.7",
     "express": "4.16.4",
+    "electron-packager": "^12.1.2",
     "flow-bin": "0.77.0",
     "fs-extra": "7.0.0",
     "glob": "7.1.3",
