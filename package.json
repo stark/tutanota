@@ -22,6 +22,7 @@
     "caller": "1.0.1",
     "chokidar": "1.4.3",
     "chokidar-socket-emitter": "0.6.0",
+    "commander": "^2.18.0",
     "core-js": "2.5.7",
     "express": "4.16.4",
     "electron-packager": "^12.1.2",
