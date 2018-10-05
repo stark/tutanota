@@ -1,5 +1,6 @@
 // @flow
 import m from "mithril"
+import bridge from "../bridge"
 import {Dialog} from "../gui/base/Dialog"
 import {Button, ButtonType, createAsyncDropDownButton, createDropDownButton} from "../gui/base/Button"
 import {TextField, Type} from "../gui/base/TextField"
@@ -215,7 +216,11 @@ export class MailEditor {
 
 		this.view = () => {
 			return m("#mail-editor.full-height.text.touch-callout", {
-				oncreate: vnode => this._domElement = vnode.dom,
+				oncreate: vnode => {
+					this._domElement = vnode.dom
+					bridge.startListening('close', closeButton.clickHandler)
+				},
+				onremove: vnode => bridge.stopListening('close', closeButton.clickHandler),
 				onclick: (e) => {
 					if (e.target === this._domElement) {
 						this._editor.focus()
