@@ -4,10 +4,10 @@
  * 2. copied to app-desktop/build/dist from dist.js (DesktopBuilder)
  */
 
-module.exports = function (nameSuffix, version, targetUrl, iconPath) {
+module.exports = function (nameSuffix, version, targetUrl, iconPath, sign) {
 	return {
 		"name": "tutanota-desktop" + nameSuffix,
-		"main": "./src/desktop/mainDesktop.js",
+		"main": "./src/desktop/DesktopMain.js",
 		"version": version,
 		"author": "Tutao GmbH",
 		"description": "The desktop client for Tutanota, the secure e-mail service.",
@@ -16,13 +16,20 @@ module.exports = function (nameSuffix, version, targetUrl, iconPath) {
 		},
 		"dependencies": {
 			"electron-updater": "^3.1.2",
-			"electron-debug": "^2.0.0"
+			"electron-localshortcut": "^3.1.0",
+			"fs-extra": "1.0.0"
 		},
 		"devDependencies": {
 			"electron": "^3.0.0"
 		},
 		"build": {
+			//"afterPack": "./buildSrc/builderHook.js",
+			//"afterSign": "./buildSrc/builderHook.js",
+			//"afterAllArtifactBuild": "./buildSrc/builderHook.js",
 			"icon": iconPath,
+			"appId": "de.tutao.tutanota",
+			"productName": nameSuffix.slice(1) + " Tutanota Desktop",
+			"artifactName": "${name}-${version}-${os}.${ext}",
 			"protocols": [
 				{
 					"name": "Mailto Links",
@@ -38,15 +45,14 @@ module.exports = function (nameSuffix, version, targetUrl, iconPath) {
 				"channel": "latest",
 				"publishAutoUpdate": true
 			},
-			"appId": "de.tutao.tutanota",
-			"productName": "Tutanota Desktop" + nameSuffix,
-			"artifactName": "${name}-${version}-${os}.${ext}",
 			"directories": {
 				"output": "installers"
 			},
 			"win": {
 				"publisherName": "Tutao GmbH",
-				"sign": "./buildSrc/winsigner.js",
+				"sign": sign
+					? "./buildSrc/winsigner.js"
+					: undefined,
 				"signingHashAlgorithms": [
 					"sha256"
 				],
@@ -56,6 +62,12 @@ module.exports = function (nameSuffix, version, targetUrl, iconPath) {
 						"arch": "x64"
 					}
 				]
+			},
+			"nsis": {
+				"oneClick": true,
+				"perMachine": false,
+				"createStartMenuShortcut": true,
+				"allowElevation": true,
 			},
 			"mac": {
 				"target": [

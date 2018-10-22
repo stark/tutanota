@@ -4,6 +4,7 @@ export const Mode = {
 	Browser: "Browser",
 	App: "App",
 	Test: "Test",
+	Desktop: "Desktop"
 }
 
 export function getWebsocketOrigin(): string {

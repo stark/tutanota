@@ -1,38 +1,102 @@
 declare module 'electron' {
-	declare var app: {
-		on: (AppEvent, (Event, ...Array<any>) => void) => void,
-		requestSingleInstanceLock(): () => void,
-		quit: () => void,
+	declare export var app: {
+		on(AppEvent, (Event, ...Array<any>) => void): void,
+		requestSingleInstanceLock(): void,
+		quit(): void,
+		exit(code: Number): void,
+		getVersion(): string,
+		getName(): string,
+		setAppUserModelId(string): void,
+		isDefaultProtocolClient(protocol: string, path?: string, args?: [string]): boolean,
+		setAsDefaultProtocolClient(protocol: string, path?: string, args?: [string]): boolean,
+		removeAsDefaultProtocolClient(protocol: string, path?: string, args?: [string]): boolean,
 	};
-	declare var ipcRenderer: any;
-	declare var ipcMain: any;
+	declare export var remote: any;
+	declare export var ipcRenderer: any;
+	declare export var ipcMain: any;
 
-	declare class BrowserWindow {
+	declare export class BrowserWindow {
 		// https://github.com/electron/electron/blob/master/docs/api/browser-window.md#new-browserwindowoptions
 		constructor(any): BrowserWindow;
-		on: (BrowserWindowEvent, (Event, ...Array<any>) => void) => void;
-		focus: () => void;
-		restore: () => void;
-		loadFile: (file: string) => void;
-		loadUrl: (url: string) => void;
-		isMinimized: () => boolean;
-		openDevTools: () => void;
+		on(BrowserWindowEvent, (Event, ...Array<any>) => void): BrowserWindow;
+		focus(): void;
+		restore(): void;
+		show(): void;
+		loadFile(string): void;
+		loadURL(string): void;
+		isMinimized(): boolean;
+		openDevTools(): void;
 		webContents: WebContents;
 	}
+
+	declare export class Notification {
+		constructor({|
+			            title: string,
+			            subtitle?: string,
+			            body: string,
+			            silent?: boolean,
+			            icon?: string,
+			            hasReply?: boolean,
+			            replyPlaceholder?: string,
+			            sound?: string,
+			            actions?: [NotificationAction],
+			            closeButtonText?: string
+		            |}): Notification;
+		on(DesktopNotificationEvent, (Event, ...Array<any>) => void): Notification;
+		show(): void;
+		static isSupported(): boolean;
+	}
+
+	declare export class WebContents {
+		on(WebContentsEvent, (Event, ...Array<any>) => void): WebContents;
+		send(BridgeMessage, any): void;
+		session: ElectronSession;
+		getURL(): string;
+		openDevTools({|mode: string|}): void;
+		isDevToolsOpened(): boolean;
+		closeDevTools(): void;
+		reloadIgnoringCache(): void;
+	}
+
+	declare export class ElectronSession {
+		setPermissionRequestHandler: (PermissionRequestHandler | null) => void;
+	}
+
+	declare export type PermissionRequestHandler = (WebContents, ElectronPermission, (boolean) => void) => void;
+	declare export type ElectronPermission
+		= 'media'
+		| 'geolocation'
+		| 'notifications'
+		| 'midiSysex'
+		| 'pointerLock'
+		| 'fullscreen'
+		| 'openExternal';
 }
 
 declare module 'electron-updater' {
 	declare export var autoUpdater: AutoUpdater
 }
 
-declare module 'electron-debug' {
-	declare export default typeof Function;
+declare module 'electron-localshortcut' {
+	declare module .exports: {
+		register(shortcut: string, cb: Function): void;
+		unregister(shortcut: string): void;
+		isRegistered(shortcut: string): boolean;
+		unregisterAll(): void;
+		enableAll(): void;
+		disableAll(): void;
+	}
+;
 }
 
-declare class ElectronSession {
-	setPermissionRequestHandler: (PermissionRequestHandler | null) => void;
+declare module 'fs-extra' {
+	declare export default any;
+	//declare export var fs: any;
 }
 
+declare module 'bluebird' {
+	declare export default any;
+}
 
 declare class AutoUpdater {
 	on: (AutoUpdaterEvent, (Event, ...Array<any>) => void) => void;
@@ -44,23 +108,58 @@ declare class AutoUpdater {
 		warn: (string) => void,
 		silly: (string) => void
 	};
-	checkForUpdatesAndNotify: () => Promise<any>
+	checkForUpdatesAndNotify(): Promise<any>;
+	checkForUpdates(): Promise<UpdateCheckResult>;
+	quitAndInstall(isSilent?: boolean, isForceRunAfter?: boolean): void;
+	autoInstallOnAppQuit: boolean;
+	currentVersion: SemVer;
 }
 
-declare class WebContents {
-	on: (WebContentsEvent, (Event, ...Array<any>) => void) => void;
-	send: (BridgeMessage, any) => void;
-	session: ElectronSession;
-	getURL: () => string
+// https://electronjs.org/docs/api/structures/notification-action
+export type NotificationAction = {|
+	type: string,
+	text?: string
+|}
+
+export type UpdateCheckResult = {
+	updateInfo: UpdateInfo,
+	downloadPromise: Promise<Array<String>>,
+	cancellationToken: CancellationToken
 }
 
-type PermissionRequestHandler = (WebContents, ElectronPermission, (boolean) => void) => void;
-type ElectronPermission = 'media' | 'geolocation' | 'notifications' | 'midiSysex' | 'pointerLock' | 'fullscreen' | 'openExternal';
+export type UpdateInfo = {
+	version: string,
+	files: Array<UpdateFileInfo>,
+	path: string,
+	sha512: string,
+	releaseName: string,
+	releaseNotes: string,
+	releaseDate: string,
+	stagingPercentage: Number
+}
+
+export type SemVer = {
+	raw: string,
+	major: Number,
+	minor: Number,
+	patch: Number,
+	version: string
+}
+
+export type CancellationToken = {
+	cancel(): void,
+	onCancel(Function): void
+}
+
+export type UpdateFileInfo = {
+	url: string
+}
 
 export type Bridge = {|
 	sendMessage: (msg: BridgeMessage, data: any) => void,
 	startListening: (msg: BridgeMessage, listener: Function) => void,
 	stopListening: (msg: BridgeMessage, listener: Function) => void,
+	getVersion: () => string,
 |}
 
 // https://github.com/electron/electron/blob/master/docs/api/app.md#events
@@ -169,6 +268,13 @@ export type WebContentsEvent = 'did-finish-load' |
 	'did-attach-webview' |
 	'console-message'
 
+export type DesktopNotificationEvent
+	= 'show'
+	| 'click'
+	| 'close'
+	| 'reply'
+	| 'action'
+
 export type AutoUpdaterEvent = 'error' |
 	'checking-for-update' |
 	'update-available' |
@@ -178,5 +284,9 @@ export type AutoUpdaterEvent = 'error' |
 
 
 // Add Tutanota specific Messages here
-export type BridgeMessage = 'close'
+export type BridgeMessage
+	= 'window-close'    // user closed the client
+	| 'close-editor'    // try to close the mail editor
+	| 'editor-closed'   // editor was closed
+	| 'mailto'          // external navigation event
 

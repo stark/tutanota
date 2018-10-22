@@ -1,7 +1,5 @@
 // @flow
-import {ipcRenderer} from 'electron'
-
-console.log("Preloaded")
+import {ipcRenderer, remote} from 'electron'
 
 function sendMessage(msg, args) {
 	return ipcRenderer.send(msg, args);
@@ -19,6 +17,7 @@ const bridge: Bridge = {
 	sendMessage: (msg: BridgeMessage, data: any) => sendMessage(msg, data),
 	startListening: (msg: BridgeMessage, listener: Function) => receiveMessage(msg, listener),
 	stopListening: (msg: BridgeMessage, listener: Function) => removeListener(msg, listener),
+	getVersion: () => remote.require('electron').app.getVersion(),
 }
 
 window.bridge = bridge

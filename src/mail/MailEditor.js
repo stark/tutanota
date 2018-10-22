@@ -218,9 +218,9 @@ export class MailEditor {
 			return m("#mail-editor.full-height.text.touch-callout", {
 				oncreate: vnode => {
 					this._domElement = vnode.dom
-					bridge.startListening('close', closeButton.clickHandler)
+					bridge.startListening('close-editor', closeButton.clickHandler)
 				},
-				onremove: vnode => bridge.stopListening('close', closeButton.clickHandler),
+				onremove: vnode => bridge.stopListening('close-editor', closeButton.clickHandler),
 				onclick: (e) => {
 					if (e.target === this._domElement) {
 						this._editor.focus()

@@ -59,7 +59,10 @@ Promise.resolve()
        .then(buildDesktopClient)
        .then(packageDeb)
        .then(release)
-       .then(() => console.log(`\nBuild time: ${measure()}s`))
+       .then(() => {
+	       const now = new Date(Date.now()).toTimeString().substr(0, 5)
+	       console.log(`\nBuild time: ${measure()}s (${now})`)
+       })
        .catch(e => {
 	       console.log("\nBuild error:", e)
 	       process.exit(1)
@@ -170,13 +173,13 @@ function buildDesktopClient() {
 	if (options.desktop) {
 		if (options.host === undefined) {
 			return createHtml(env.create(SystemConfig.distRuntimeConfig(bundles), "https://mail.tutanota.com", version, "Desktop", true), bundles)
-				.then(() => desktopBuilder.build(__dirname, packageJSON.version, options.desktop, "https://mail.tutanota.com", "https://mail.tutanota.com/desktop", ""))
+				.then(() => desktopBuilder.build(__dirname, packageJSON.version, options.desktop, "https://mail.tutanota.com/desktop", ""))
 				.then(() => createHtml(env.create(SystemConfig.distRuntimeConfig(bundles), "https://test.tutanota.com", version, "Desktop", true), bundles))
-				.then(() => desktopBuilder.build(__dirname, packageJSON.version, options.desktop, "https://test.tutanota.com", "https://test.tutanota.com/desktop-test", "-test"))
+				.then(() => desktopBuilder.build(__dirname, packageJSON.version, options.desktop, "https://test.tutanota.com/desktop-test", "-test"))
 		} else {
 			return createHtml(env.create(SystemConfig.distRuntimeConfig(bundles), targetUrl, version, "Desktop", true), bundles)
 				.then(() => desktopBuilder.build(__dirname, `${new Date().getTime()}.0.0`,
-					options.desktop, targetUrl, "https://next.tutao.de/desktop-snapshot", "-snapshot"))
+					options.desktop, "https://next.tutao.de/desktop-snapshot", "-snapshot"))
 		}
 	}
 }

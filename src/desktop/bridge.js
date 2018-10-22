@@ -5,6 +5,7 @@ const stubs: Bridge = {
 	sendMessage: (msg: BridgeMessage, data: any) => {},
 	startListening: (msg: BridgeMessage, listener: Function) => {},
 	stopListening: (msg: BridgeMessage, listener: Function) => {},
+	getVersion: () => window.env.versionNumber
 }
 
 let bridge: Bridge = new Proxy(stubs, {

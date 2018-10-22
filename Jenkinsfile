@@ -131,7 +131,7 @@ pipeline {
             	}
 				sh '''
 					target=`ls /opt/desktop-snapshot/tutanota-desktop*`;
-					ln -s ${target} /opt/desktop-snapshot/tutanota-desktop-snapshot-linux.AppImage
+					ln -s "${target}" /opt/desktop-snapshot/tutanota-desktop-snapshot-linux.AppImage
 				'''
             }
         }

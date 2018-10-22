@@ -212,8 +212,9 @@ function forceLogin(args: {[string]: string}, requestedPath: string) {
 	if (requestedPath.indexOf('#mail') !== -1) {
 		m.route.set(`/ext${location.hash}`)
 	} else {
-		let pathWithoutParameter = requestedPath.indexOf("?")
-		> 0 ? requestedPath.substring(0, requestedPath.indexOf("?")) : requestedPath
+		let pathWithoutParameter = requestedPath.indexOf("?") > 0
+			? requestedPath.substring(0, requestedPath.indexOf("?"))
+			: requestedPath
 		if (pathWithoutParameter.trim() === '/') {
 			let newQueryString = m.buildQueryString(args)
 			m.route.set(`/login` + (newQueryString.length > 0 ? "?" + newQueryString : ""))

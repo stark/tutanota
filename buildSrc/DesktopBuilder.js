@@ -3,7 +3,7 @@ const Builder = require('./Builder.js').Builder
 const fs = Promise.promisifyAll(require("fs-extra"))
 const path = require("path")
 
-function build(dirname, version, targets, targetUrl, updateUrl, nameSuffix) {
+function build(dirname, version, targets, updateUrl, nameSuffix) {
 	const targetString = Object.keys(targets)
 	                           .filter(k => typeof targets[k] !== "undefined")
 	                           .join(" ")
@@ -11,12 +11,13 @@ function build(dirname, version, targets, targetUrl, updateUrl, nameSuffix) {
 	const updateSubDir = "desktop" + nameSuffix
 	const distDir = path.join(dirname, '/build/dist/')
 
-	console.log("Updating config...")
+	console.log("Updating electron-builder config...")
 	const content = require('./electron-package-json-template')(
 		nameSuffix,
 		version,
 		updateUrl,
-		path.join(dirname, "/resources/desktop-icons/desktop-icon.png")
+		path.join(dirname, "/resources/desktop-icons/desktop-icon.png"),
+		nameSuffix !== "-snapshot"
 	)
 	let writeConfig = fs.writeFileAsync("./build/dist/package.json", JSON.stringify(content), 'utf-8')
 
@@ -32,8 +33,8 @@ function build(dirname, version, targets, targetUrl, updateUrl, nameSuffix) {
 		.then(() => {
 			console.log("Starting installer build...")
 			//package for linux, win, mac
-			const builder = require("electron-builder")
-			return builder.build({
+			const electronBuilder = require("electron-builder")
+			return electronBuilder.build({
 				_: ['build'],
 				win: targets.win,
 				mac: targets.mac,

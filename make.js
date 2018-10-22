@@ -76,8 +76,8 @@ function startDesktop() {
 		console.log("Building desktop client...")
 		console.log("Trying to start desktop client...")
 		const content = JSON.stringify(require('./buildSrc/electron-package-json-template')(
+			"",
 			"0.0.1",
-			null,
 			path.join(__dirname, "/resources/desktop-icons/desktop-icon.png")
 		))
 		return fs.writeFileAsync("./build/package.json", content, 'utf-8')

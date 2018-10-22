@@ -1,10 +1,11 @@
 // @flow
 import {autoUpdater} from 'electron-updater'
+import DesktopNotifier from './DesktopNotifier.js'
 
 export default class ElectronUpdater {
 
-	static initAndCheck() {
-
+	static start() {
+		//autoUpdater.autoInstallOnAppQuit = false
 		autoUpdater.logger = {
 			info: (m) => console.log("info: ", m),
 			debug: (m) => console.log("debug: ", m),
@@ -17,16 +18,23 @@ export default class ElectronUpdater {
 		autoUpdater.on('checking-for-update', () => {
 			autoUpdater.logger.info('[o] Checking for update...');
 		})
-		autoUpdater.on('update-available', () => {
-			autoUpdater.logger.info('[o] Update available.');
-		})
-		autoUpdater.on('update-not-available', () => {
-			autoUpdater.logger.info('[o] Update not available.');
-		})
-		autoUpdater.on('error', (err) => {
-			autoUpdater.logger.info('[o] Error in auto-updater. ' + err.toString());
+
+		autoUpdater.on('update-available', (info) => {
+			autoUpdater.logger.info('[o] Update available. ' + JSON.stringify(info, null, 2));
 		})
 
-		autoUpdater.checkForUpdatesAndNotify()
+		autoUpdater.on('update-downloaded', (info) => {
+			DesktopNotifier.showOneShot({
+				title: `Update available (${info.version})`,
+				body: `Click here if you want to apply it now, or let us auto install on quit.`,
+				clickHandler: () => {
+					autoUpdater.quitAndInstall(false, true)
+				}
+			})
+		})
+
+		autoUpdater.checkForUpdates().then((result) => {
+			console.log("checkUpdatesResult: ", JSON.stringify(result, null, 2))
+		})
 	}
 }
