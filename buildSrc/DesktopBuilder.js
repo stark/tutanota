@@ -1,5 +1,5 @@
 const Promise = require('bluebird')
-const Builder = require('./Builder.js').Builder
+const babelCompile = require('./Builder.js').babelCompile
 const fs = Promise.promisifyAll(require("fs-extra"))
 const path = require("path")
 
@@ -27,8 +27,8 @@ function build(dirname, version, targets, updateUrl, nameSuffix) {
 			return fs.removeAsync(path.join(distDir, "..", updateSubDir))
 		})
 		.then(() => {
-			return new Builder(dirname, distDir)
-				.build(['src/desktop'], false)
+			console.log("Tracing dependencies...")
+			transpile(['./src/desktop/DesktopMain.js', './src/desktop/preload.js'], dirname, distDir)
 		})
 		.then(() => {
 			console.log("Starting installer build...")
@@ -62,6 +62,59 @@ function build(dirname, version, targets, updateUrl, nameSuffix) {
 				fs.removeAsync(path.join(distDir, '/src/')),
 			]))
 		})
+}
+
+/**
+ * takes files and transpiles them and their dependency tree from baseDir to distDir
+ * @param files array of relative paths to baseDir
+ * @param baseDir source Directory
+ * @param distDir target Directory
+ */
+function transpile(files, baseDir, distDir) {
+	let transpiledFiles = []
+	let nextFiles = files.map((file) => path.relative(baseDir, file))
+	while (nextFiles.length !== 0) {
+		let currentPath = nextFiles.pop()
+		let sourcePath = path.join(baseDir, currentPath)
+		let targetPath = path.join(distDir, currentPath)
+		if (transpiledFiles.indexOf(sourcePath) === -1) {
+			let {src, deps} = findDirectDepsAndTranspile(sourcePath)
+			fs.mkdirsSync(path.dirname(path.resolve(distDir, currentPath)))
+			fs.writeFileSync(path.join(distDir, currentPath), src, 'utf-8')
+			transpiledFiles.push(sourcePath)
+			let i;
+			for (i = 0; i < deps.length; i++) {
+				nextFiles.push(path.relative(baseDir, deps[i]))
+			}
+			//nextFiles.concat(deps)
+			nextFiles = nextFiles.filter((elem, i) => nextFiles.indexOf(elem === i))
+		}
+	}
+	console.log("transpiled files:\n", transpiledFiles.join("\n"))
+}
+
+/**
+ * transpiles the source and finds direct dependencies
+ * only finds files that are required by path (not by node module name)
+ * @param filePath absolute path to the file
+ * @returns {{src: *, deps: Array}} src: transpiled source, deps: array of absolute paths to dependencies
+ */
+function findDirectDepsAndTranspile(filePath) {
+	let deps = []
+	const regExpRequire = /require\(["'](\..*?)["']\)/g
+	let src = babelCompile(fs.readFileSync(filePath, 'utf-8')).code
+
+	let match = regExpRequire.exec(src)
+	while (match != null) {
+		if (match[1].indexOf(".js") === -1) {
+			match[1] = match[1] + ".js"
+		}
+		let foundPath = path.join(path.dirname(filePath), match[1])
+		deps.push(foundPath)
+		match = regExpRequire.exec(src)
+	}
+
+	return {src, deps}
 }
 
 module.exports = {

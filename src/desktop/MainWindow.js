@@ -1,9 +1,9 @@
 // @flow
-import IPC from './IPC'
+import IPC from './IPC.js'
 import type {ElectronPermission} from 'electron'
 import {BrowserWindow, WebContents} from 'electron'
 import * as localShortcut from 'electron-localshortcut'
-import open from './open'
+import open from './open.js'
 import DesktopUtils from './DesktopUtils.js'
 import path from 'path'
 

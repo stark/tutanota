@@ -6,6 +6,7 @@ import fs from "fs-extra"
 import crypto from 'crypto'
 import Promise from 'bluebird'
 import {app} from 'electron'
+import {defer} from '../api/common/utils/Utils.js'
 
 export default class DesktopUtils {
 
@@ -75,7 +76,7 @@ export default class DesktopUtils {
 	}
 
 	static _elevateWin(command: string, args: [string]) {
-		const deferred = DesktopUtils.defer()
+		const deferred = defer()
 		const templatedVbs = `Set Shell = CreateObject("Shell.Application")
 Shell.ShellExecute "${command}", "${args.join(" ")}", "", "runas", 0
 `.replace(/\n/g, "\r\n")
@@ -112,7 +113,7 @@ Shell.ShellExecute "${command}", "${args.join(" ")}", "", "runas", 0
 	 * @private
 	 */
 	static _executeRegistryScript(script: string): Promise<void> {
-		const deferred = DesktopUtils.defer()
+		const deferred = defer()
 		const file = DesktopUtils._writeToDisk(script, "reg")
 		spawn('reg.exe', ['import', file], {
 			stdio: ['ignore', 'inherit', 'inherit'],
@@ -128,7 +129,7 @@ Shell.ShellExecute "${command}", "${args.join(" ")}", "", "runas", 0
 		return deferred.promise
 	}
 
-	static _writeToDisk = (contents: string, extension: string): string => {
+	static _writeToDisk(contents: string, extension: string): string {
 
 		const filename = crypto.randomBytes(12).toString('hex') + "." + extension
 		console.log("Wrote file to ", filename)
@@ -136,22 +137,5 @@ Shell.ShellExecute "${command}", "${args.join(" ")}", "", "runas", 0
 		fs.writeFileSync(filePath, contents, {encoding: 'utf-8', mode: 0o400})
 
 		return filePath
-	}
-
-	//TODO: use the defer we already have in Utils.js
-	static defer<T>(): {resolve: (T) => void, reject: (Error) => void, promise: Promise<T>} {
-		let cb
-		let promise = Promise.fromCallback(pcb => {
-			cb = pcb
-		});
-
-		const resolve = (a) => cb(null, a)
-		const reject = (e) => cb(e)
-
-		return ({
-			resolve,
-			reject,
-			promise
-		})
 	}
 }

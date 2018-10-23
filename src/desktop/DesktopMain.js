@@ -1,9 +1,9 @@
 // @flow
 import {app} from 'electron'
 import ElectronUpdater from './ElectronUpdater.js'
-import {MainWindow} from './MainWindow'
-import DesktopNotifier from "./DesktopNotifier"
-import DesktopUtils from './DesktopUtils'
+import {MainWindow} from './MainWindow.js'
+import DesktopNotifier from "./DesktopNotifier.js"
+import DesktopUtils from './DesktopUtils.js'
 
 let mainWindow: MainWindow
 
