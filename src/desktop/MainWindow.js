@@ -18,6 +18,8 @@ export class MainWindow {
 		this._startFile = DesktopUtils.pathToFileURL(normalizedPath)
 		console.log("startFile: ", this._startFile)
 		this._browserWindow = new BrowserWindow({
+			// electron process global has additional properties
+			icon: path.join((process: any).resourcesPath, 'icons/desktop-icon.png'),
 			width: 1280,
 			height: 800,
 			autoHideMenuBar: true,

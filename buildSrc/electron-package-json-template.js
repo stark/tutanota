@@ -1,3 +1,5 @@
+const path = require('path')
+
 /**
  * This is used for launching electron:
  * 1. copied to app-desktop/build from build.js
@@ -47,6 +49,10 @@ module.exports = function (nameSuffix, version, targetUrl, iconPath, sign) {
 			},
 			"directories": {
 				"output": "installers"
+			},
+			"extraResources": {
+				"from": path.dirname(iconPath),
+				"to": "./icons/"
 			},
 			"win": {
 				"publisherName": "Tutao GmbH",
