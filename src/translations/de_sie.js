@@ -1114,6 +1114,10 @@ module.exports = {
 		"yesterday_label": "gestern",
 		"yes_label": "Ja",
 		"yourFolders_action": "Ihre ORDNER",
-		"yourMessage_label": "Ihre Nachricht"
+		"yourMessage_label": "Ihre Nachricht",
+		"onlyAvailableForPremiumNotIncluded_msg": "Diese Funktion kann nur nach dem Wechsel auf Tutanota Premium gebucht werden. Bitte wechseln Sie jetzt zu Premium!",
+		"sharedMailbox_label": "Geteilte Mailboxen:",
+		"updateAvailable_label": "Neue Version verfügbar ({version})",
+		"clickToUpdate_msg": "Hier klicken um sie sofort zu installieren."
 	}
 }

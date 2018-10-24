@@ -1,11 +1,11 @@
 // @flow
 import {autoUpdater} from 'electron-updater'
-import DesktopNotifier from './DesktopNotifier.js'
+import {DesktopNotifier, NotificationResult} from './DesktopNotifier.js'
+import {lang} from './DesktopLocalizationProvider'
 
 export default class ElectronUpdater {
 
 	static start() {
-		//autoUpdater.autoInstallOnAppQuit = false
 		autoUpdater.logger = {
 			info: (m) => console.log("info: ", m),
 			debug: (m) => console.log("debug: ", m),
@@ -25,16 +25,19 @@ export default class ElectronUpdater {
 
 		autoUpdater.on('update-downloaded', (info) => {
 			DesktopNotifier.showOneShot({
-				title: `Update available (${info.version})`,
-				body: `Click here if you want to apply it now, or let us auto install on quit.`,
-				clickHandler: () => {
+				title: lang.get('updateAvailable_label', {"{version}": info.version}),
+				body: lang.get('clickToUpdate_msg'),
+			}).then((res) => {
+				if (res === NotificationResult.Click) {
 					autoUpdater.quitAndInstall(false, true)
 				}
 			})
 		})
 
-		autoUpdater.checkForUpdates().then((result) => {
-			console.log("checkUpdatesResult: ", JSON.stringify(result, null, 2))
-		})
+		autoUpdater
+			.checkForUpdates()
+			.then((result) => {
+				console.log("checkUpdatesResult: ", JSON.stringify(result, null, 2))
+			})
 	}
 }

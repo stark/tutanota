@@ -163,124 +163,121 @@ export type Bridge = {|
 |}
 
 // https://github.com/electron/electron/blob/master/docs/api/app.md#events
-export type AppEvent = 'will-finish-launching' |
-	'ready' |
-	'second-instance' |
-	'activate' |
-	'window-all-closed' |
-	'before-quit' |
-	'will-quit' |
-	'open-file' |
-	'open-url' |
-	'continue-activity' |
-	'will-continue-activity' |
-	'continue-activity-error' |
-	'activity-was-continued' |
-	'update-activity-state' |
-	'new-window-for-tab' |
-	'browser-window-blur' |
-	'browser-window-focus' |
-	'browser-window-created' |
-	'web-contents-created' |
-	'certificate-error' |
-	'select-client-certificate' |
-	'login' |
-	'gpu-process-crashed' |
-	'accessibility-support-changed' |
-	'session-created'
+export type AppEvent
+	= 'will-finish-launching'
+	| 'ready'
+	| 'second-instance'
+	| 'activate'
+	| 'window-all-closed'
+	| 'before-quit'
+	| 'will-quit'
+	| 'open-file'
+	| 'open-url'
+	| 'continue-activity'
+	| 'will-continue-activity'
+	| 'continue-activity-error'
+	| 'activity-was-continued'
+	| 'update-activity-state'
+	| 'new-window-for-tab'
+	| 'browser-window-blur'
+	| 'browser-window-focus'
+	| 'browser-window-created'
+	| 'web-contents-created'
+	| 'certificate-error'
+	| 'select-client-certificate'
+	| 'login'
+	| 'gpu-process-crashed'
+	| 'accessibility-support-changed'
+	| 'session-created'
 
 
 // https://github.com/electron/electron/blob/master/docs/api/browser-window.md#instance-events
-export type BrowserWindowEvent = 'page-title-updated' |
-	'close' |
-	'closed' |
-	'session-end' |
-	'unresponsive' |
-	'responsive' |
-	'blur' |
-	'focus' |
-	'show' |
-	'hide' |
-	'ready-to-show' |
-	'maximize' |
-	'unmaximize' |
-	'minimize' |
-	'restore' |
-	'will-resize' |
-	'resize' |
-	'will-move' |
-	'move' |
-	'moved' |
-	'enter-full-screen' |
-	'leave-full-screen' |
-	'enter-html-full-screen' |
-	'leave-html-full-screen' |
-	'always-on-top-changed' |
-	'app-command' |
-	'scroll-touch-begin' |
-	'scroll-touch-end' |
-	'scroll-touch-edge' |
-	'swipe' |
-	'sheet-begin' |
-	'sheet-end' |
-	'new-window-for-tab'
+export type BrowserWindowEvent
+	= 'page-title-updated'
+	| 'close'
+	| 'closed'
+	| 'session-end'
+	| 'unresponsive'
+	| 'responsive'
+	| 'blur'
+	| 'focus'
+	| 'show'
+	| 'hide'
+	| 'ready-to-show'
+	| 'maximize'
+	| 'unmaximize'
+	| 'minimize'
+	| 'restore'
+	| 'will-resize'
+	| 'resize'
+	| 'will-move'
+	| 'move'
+	| 'moved'
+	| 'enter-full-screen'
+	| 'leave-full-screen'
+	| 'enter-html-full-screen'
+	| 'leave-html-full-screen'
+	| 'always-on-top-changed'
+	| 'app-command'
+	| 'scroll-touch-begin'
+	| 'scroll-touch-end'
+	| 'scroll-touch-edge'
+	| 'swipe'
+	| 'sheet-begin'
+	| 'sheet-end'
+	| 'new-window-for-tab'
 
 // https://github.com/electron/electron/blob/master/docs/api/web-contents.md#instance-events
-export type WebContentsEvent = 'did-finish-load' |
-	'did-fail-load' |
-	'did-frame-finish-load' |
-	'did-start-loading' |
-	'did-stop-loading' |
-	'dom-ready' |
-	'page-favicon-updated' |
-	'new-window' |
-	'will-navigate' |
-	'did-start-navigation' |
-	'will-redirect' |
-	'did-redirect-navigation' |
-	'did-navigate' |
-	'did-frame-navigate' |
-	'did-navigate-in-page' |
-	'will-prevent-unload' |
-	'crashed' |
-	'unresponsive' |
-	'responsive' |
-	'plugin-crashed' |
-	'destroyed' |
-	'before-input-event' |
-	'devtools-opened' |
-	'devtools-closed' |
-	'devtools-focused' |
-	'certificate-error' |
-	'select-client-certificate' |
-	'login' |
-	'found-in-page' |
-	'media-started-playing' |
-	'media-paused' |
-	'did-change-theme-color' |
-	'update-target-url' |
-	'cursor-changed' |
-	'context-menu' |
-	'select-bluetooth-device' |
-	'paint' |
-	'devtools-reload-page' |
-	'will-attach-webview' |
-	'did-attach-webview' |
-	'console-message'
+export type WebContentsEvent
+	= 'did-finish-load'
+	| 'did-fail-load'
+	| 'did-frame-finish-load'
+	| 'did-start-loading'
+	| 'did-stop-loading'
+	| 'dom-ready'
+	| 'page-favicon-updated'
+	| 'new-window'
+	| 'will-navigate'
+	| 'did-start-navigation'
+	| 'will-redirect'
+	| 'did-redirect-navigation'
+	| 'did-navigate'
+	| 'did-frame-navigate'
+	| 'did-navigate-in-page'
+	| 'will-prevent-unload'
+	| 'crashed'
+	| 'unresponsive'
+	| 'responsive'
+	| 'plugin-crashed'
+	| 'destroyed'
+	| 'before-input-event'
+	| 'devtools-opened'
+	| 'devtools-closed'
+	| 'devtools-focused'
+	| 'certificate-error'
+	| 'select-client-certificate'
+	| 'login'
+	| 'found-in-page'
+	| 'media-started-playing'
+	| 'media-paused'
+	| 'did-change-theme-color'
+	| 'update-target-url'
+	| 'cursor-changed'
+	| 'context-menu'
+	| 'select-bluetooth-device'
+	| 'paint'
+	| 'devtools-reload-page'
+	| 'will-attach-webview'
+	| 'did-attach-webview'
+	| 'console-message'
 
-export type DesktopNotificationEvent
-	= 'show'
-	| 'click'
-	| 'close'
-	| 'reply'
-	| 'action'
-
-export type AutoUpdaterEvent = 'error' |
-	'checking-for-update' |
-	'update-available' |
-	'update-not-available' |
-	'download-progress' |
-	'update-downloaded'
+export type AutoUpdaterEvent
+	= 'error'
+	| 'checking-for-update'
+	| 'update-available'
+	| 'update-not-available'
+	| 'download-progress'
+	| 'update-downloaded'
 
 
 // Add Tutanota specific Messages here
@@ -289,4 +286,6 @@ export type BridgeMessage
 	| 'close-editor'    // try to close the mail editor
 	| 'editor-closed'   // editor was closed
 	| 'mailto'          // external navigation event
+	| 'webapp-ready'    // can start communication with webapp
+	| 'get-translations'
 

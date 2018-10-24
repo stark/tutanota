@@ -1,6 +1,7 @@
 //@flow
 import {client} from "./misc/ClientDetector"
 import m from "mithril"
+import bridge from './desktop/bridge.js'
 import stream from "mithril/stream/stream.js"
 import en from "./translations/en"
 import {lang} from "./misc/LanguageViewModel"
@@ -205,8 +206,7 @@ let initialized = lang.init(en).then(() => {
 		.then(module => module.worker)
 
 	setupExceptionHandling()
-})
-
+}).then(() => bridge.sendMessage('webapp-ready'))
 
 function forceLogin(args: {[string]: string}, requestedPath: string) {
 	if (requestedPath.indexOf('#mail') !== -1) {

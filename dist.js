@@ -28,7 +28,7 @@ const bundlesCache = "build/bundles.json"
 
 function getAsyncImports(file) {
 	let appSrc = fs.readFileSync(path.resolve(__dirname, file), 'utf-8')
-	const regExp = /_asyncImport\(["|'](.*)["|']\)/g
+	const regExp = /_asyncImport\(["|'](.*?)["|']\)/g
 	let match = regExp.exec(appSrc)
 	let asyncImports = []
 	while (match != null) {

@@ -5,10 +5,12 @@ export default class IPC {
 
 	static _send = () => console.log("ipc not initialized!")
 	static _on = () => console.log("ipc not initialized!")
+	static _once = () => console.log("ipc not initialized!")
 
 	static init(window: BrowserWindow) {
 		IPC._send = (...args: any) => window.webContents.send.apply(window.webContents, args)
 		IPC._on = (...args: any) => ipcMain.on.apply(ipcMain, args)
+		IPC._once = (...args: any) => ipcMain.once.apply(ipcMain, args)
 	}
 
 	static send(...args: any) {
@@ -16,6 +18,10 @@ export default class IPC {
 	}
 
 	static on(...args: any) {
+		return IPC._on.apply(this, args)
+	}
+
+	static once(...args: any) {
 		return IPC._on.apply(this, args)
 	}
 }

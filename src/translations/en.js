@@ -1107,6 +1107,10 @@ module.exports = {
 		"yesterday_label": "yesterday",
 		"yes_label": "Yes",
 		"yourFolders_action": "YOUR FOLDERS",
-		"yourMessage_label": "Your message"
+		"yourMessage_label": "Your message",
+		"onlyAvailableForPremiumNotIncluded_msg": "This feature can only be ordered after upgrading to Premium. Please upgrade your account now.",
+		"sharedMailbox_label": "Shared mailboxes:",
+		"updateAvailable_label": "Update available ({version})",
+		"clickToUpdate_msg": "Click here if you want to apply it now, or let us auto install on quit."
 	}
 }
