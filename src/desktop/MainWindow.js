@@ -105,7 +105,7 @@ export class MainWindow {
 
 	_permissionRequestHandler(webContents: WebContents, permission: ElectronPermission, callback: (boolean) => void) {
 		const url = webContents.getURL()
-		if (!url.startsWith('https://mail.tutanota.com') || !(permission === 'notifications')) {
+		if (!(url.startsWith('file://') && (permission === 'notifications'))) {
 			return callback(false)
 		}
 		return callback(true)
