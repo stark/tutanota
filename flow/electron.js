@@ -287,5 +287,5 @@ export type BridgeMessage
 	| 'editor-closed'   // editor was closed
 	| 'mailto'          // external navigation event
 	| 'webapp-ready'    // can start communication with webapp
-	| 'get-translations'
+	| 'get-translations'// get all translations from the webapp
 

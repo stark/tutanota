@@ -32,27 +32,17 @@ export default class DesktopUtils {
 		return urlFromPath.trim()
 	}
 
-	/**
-	 * Checks if the user has admin privileges on Windows
-	 * @returns {boolean} true if user has admin privileges
-	 */
-	static isUserAdmin(): boolean {
-		let isAdmin = false
-		exec('NET SESSION', (err, so, se) => {
-			isAdmin = (se.length === 0)
-			console.log(se.length === 0 ? "admin" : "not admin");
-		})
-		return isAdmin
-	}
-
 	static registerAsMailtoHandler(tryToElevate: boolean): Promise<void> {
 		switch (process.platform) {
 			case "win32":
-				if (!DesktopUtils.isUserAdmin() && tryToElevate) {
-					return DesktopUtils._elevateWin(process.execPath, ["-r"])
-				} else {
-					return DesktopUtils.registerOnWin()
-				}
+				return checkForAdminStatus()
+					.then((isAdmin) => {
+						if (!isAdmin && tryToElevate) {
+							return DesktopUtils._elevateWin(process.execPath, ["-r"])
+						} else if (isAdmin) {
+							return DesktopUtils.registerOnWin()
+						}
+					})
 			case "darwin":
 				return Promise.resolve()
 			case "linux":
@@ -63,11 +53,14 @@ export default class DesktopUtils {
 	static unregisterAsMailtoHandler(tryToElevate: boolean): Promise<void> {
 		switch (process.platform) {
 			case "win32":
-				if (!DesktopUtils.isUserAdmin() && tryToElevate) {
-					return DesktopUtils._elevateWin(process.execPath, ["-u"])
-				} else {
-					return DesktopUtils.unregisterOnWin()
-				}
+				return checkForAdminStatus()
+					.then((isAdmin) => {
+						if (!isAdmin && tryToElevate) {
+							return DesktopUtils._elevateWin(process.execPath, ["-u"])
+						} else if (isAdmin) {
+							return DesktopUtils.unregisterOnWin()
+						}
+					})
 			case "darwin":
 				return Promise.resolve()
 			case "linux":
@@ -75,17 +68,15 @@ export default class DesktopUtils {
 		}
 	}
 
-	static _elevateWin(command: string, args: [string]) {
+	static _elevateWin(command: string, args: Array<string>) {
 		const deferred = defer()
-		const templatedVbs = `Set Shell = CreateObject("Shell.Application")
-Shell.ShellExecute "${command}", "${args.join(" ")}", "", "runas", 0
-`.replace(/\n/g, "\r\n")
-		const file = DesktopUtils._writeToDisk(templatedVbs, "vbs")
-		spawn("wscript.exe", [file], {
+		const elevateExe = path.join((process: any).resourcesPath, "elevate.exe")
+		let elevateArgs = ["-wait", command].concat(args)
+		spawn(elevateExe, elevateArgs, {
 			stdio: ['ignore', 'inherit', 'inherit'],
 			detached: false
 		}).on('exit', (code, signal) => {
-			fs.unlinkSync(file)
+			console.log("code: ", code)
 			if (code === 0) {
 				deferred.resolve()
 			} else {
@@ -130,7 +121,6 @@ Shell.ShellExecute "${command}", "${args.join(" ")}", "", "runas", 0
 	}
 
 	static _writeToDisk(contents: string, extension: string): string {
-
 		const filename = crypto.randomBytes(12).toString('hex') + "." + extension
 		console.log("Wrote file to ", filename)
 		const filePath = path.join(path.dirname(process.execPath), filename)
@@ -138,4 +128,23 @@ Shell.ShellExecute "${command}", "${args.join(" ")}", "", "runas", 0
 
 		return filePath
 	}
+}
+
+/**
+ * Checks if the user has admin privileges
+ * @returns {boolean} true if user has admin privileges
+ */
+function checkForAdminStatus(): Promise<boolean> {
+	let deferred = defer()
+	switch (process.platform) {
+		case "win32":
+			exec('NET SESSION', (err, so, se) => {
+				console.log(se.length === 0 ? "admin" : "not admin");
+				deferred.resolve(se.length === 0)
+			})
+			break;
+		default:
+			deferred.resolve(true)
+	}
+	return deferred.promise
 }

@@ -8,24 +8,24 @@ export const NotificationResult = {
 	Close: 'close'
 }
 
-export class DesktopNotifier {
-	static _canShow = false
-	static pendingNotifications: Array<Function> = []
+class DesktopNotifier {
+	_canShow : boolean = false
+	pendingNotifications: Array<Function> = []
 
 	/**
 	 * signal that notifications can now be shown. also start showing notifications that came
 	 * in before this point
 	 */
-	static start(): void {
+	start(): void {
 		setTimeout(() => {
-			DesktopNotifier._canShow = true
-			while (DesktopNotifier.pendingNotifications.length > 0) {
-				(DesktopNotifier.pendingNotifications.pop())()
+			this._canShow = true
+			while (this.pendingNotifications.length > 0) {
+				(this.pendingNotifications.pop())()
 			}
 		}, 2000)
 	}
 
-	static isAvailable(): boolean {
+	isAvailable(): boolean {
 		return Notification.isSupported()
 	}
 
@@ -36,24 +36,24 @@ export class DesktopNotifier {
 	 * @param props.clickHandler Called when the user clicks the notification
 	 * @param props.closeHandler Called when the notification was closed (by timeout or user action).
 	 */
-	static showOneShot(props: {|
+	showOneShot(props: {|
 		title: string,
 		body?: string,
 		icon?: string
 	|}): Promise<NotificationResultEnum> {
-		if (!DesktopNotifier.isAvailable()) {
+		if (!this.isAvailable()) {
 			return Promise.resolve()
 		}
 		let promise: Promise
-		if (DesktopNotifier._canShow) {
-			promise = new Promise((resolve, reject) => DesktopNotifier._makeNotification(props, (res) => {
+		if (this._canShow) {
+			promise = new Promise((resolve, reject) => this._makeNotification(props, (res) => {
 				return () => resolve(res)
 			}))
 		} else {
-			promise = new Promise((resolve, reject) => DesktopNotifier.pendingNotifications.push(resolve))
+			promise = new Promise((resolve, reject) => this.pendingNotifications.push(resolve))
 				.then(() => {
 					return new Promise((resolve, reject) => {
-						DesktopNotifier._makeNotification(props, (res) => {
+						this._makeNotification(props, (res) => {
 							return () => resolve(res)
 						})
 					})
@@ -62,7 +62,7 @@ export class DesktopNotifier {
 		return promise
 	}
 
-	static _makeNotification(props: {|
+	_makeNotification(props: {|
 		title: string,
 		body?: string,
 		icon?: string
@@ -80,3 +80,5 @@ export class DesktopNotifier {
 		oneshot.show()
 	}
 }
+
+export const notifier = new DesktopNotifier()

@@ -1,9 +1,9 @@
 // @flow
 import {app} from 'electron'
-import ElectronUpdater from './ElectronUpdater.js'
+import {updater} from './ElectronUpdater.js'
 import {MainWindow} from './MainWindow.js'
 import DesktopUtils from './DesktopUtils.js'
-import {DesktopNotifier} from "./DesktopNotifier.js"
+import {notifier} from "./DesktopNotifier.js"
 import {lang} from './DesktopLocalizationProvider.js'
 import IPC from './IPC.js'
 
@@ -16,14 +16,14 @@ console.log("version:  ", app.getVersion())
 const createMainWindow = () => {
 	mainWindow = new MainWindow()
 	console.log("mailto handler: ", app.isDefaultProtocolClient("mailto"))
-	console.log("notifications: ", DesktopNotifier.isAvailable())
+	console.log("notifications: ", notifier.isAvailable())
 	IPC.on('webapp-ready', main)
 }
 
 const main = () => {
 	console.log("Webapp ready")
-	DesktopNotifier.start()
-	ElectronUpdater.start()
+	notifier.start()
+	updater.start()
 	lang.init()
 	    .catch((e) => {
 		    console.log("error during lang init: ", e)
@@ -43,7 +43,7 @@ const main = () => {
 	//    return DesktopUtils.registerAsMailtoHandler(true)
 	// })
 	// .then(() => console.log("successfully registered as mailto handler "))
-	// .catch(() => "did not register as mailto handler")
+	// .catch((e) => console.log(e))
 }
 
 //check if there are any cli parameters that should be handled without a window
