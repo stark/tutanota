@@ -11,7 +11,6 @@ import {defer} from '../api/common/utils/Utils.js'
 export default class DesktopUtils {
 
 	/**
-	 *
 	 * @param pathToConvert absolute Path to a file
 	 * @returns {string} file:// URL that can be extended with query parameters and loaded with BrowserWindow.loadURL()
 	 */
@@ -38,9 +37,9 @@ export default class DesktopUtils {
 				return checkForAdminStatus()
 					.then((isAdmin) => {
 						if (!isAdmin && tryToElevate) {
-							return DesktopUtils._elevateWin(process.execPath, ["-r"])
+							return _elevateWin(process.execPath, ["-r"])
 						} else if (isAdmin) {
-							return DesktopUtils.registerOnWin()
+							return _registerOnWin()
 						}
 					})
 			case "darwin":
@@ -56,9 +55,9 @@ export default class DesktopUtils {
 				return checkForAdminStatus()
 					.then((isAdmin) => {
 						if (!isAdmin && tryToElevate) {
-							return DesktopUtils._elevateWin(process.execPath, ["-u"])
+							return _elevateWin(process.execPath, ["-u"])
 						} else if (isAdmin) {
-							return DesktopUtils.unregisterOnWin()
+							return _unregisterOnWin()
 						}
 					})
 			case "darwin":
@@ -66,67 +65,6 @@ export default class DesktopUtils {
 			case "linux":
 				return Promise.resolve()
 		}
-	}
-
-	static _elevateWin(command: string, args: Array<string>) {
-		const deferred = defer()
-		const elevateExe = path.join((process: any).resourcesPath, "elevate.exe")
-		let elevateArgs = ["-wait", command].concat(args)
-		spawn(elevateExe, elevateArgs, {
-			stdio: ['ignore', 'inherit', 'inherit'],
-			detached: false
-		}).on('exit', (code, signal) => {
-			console.log("code: ", code)
-			if (code === 0) {
-				deferred.resolve()
-			} else {
-				deferred.reject(new Error("couldn't elevate permissions"))
-			}
-		})
-		return deferred.promise
-	}
-
-	static registerOnWin(): Promise<void> {
-		const tmpRegScript = require('./reg-templater.js').registerKeys(process.execPath)
-		return DesktopUtils._executeRegistryScript(tmpRegScript)
-		                   .then(() => app.setAsDefaultProtocolClient('mailto'))
-	}
-
-	static unregisterOnWin(): Promise<void> {
-		app.removeAsDefaultProtocolClient('mailto')
-		const tmpRegScript = require('./reg-templater.js').unregisterKeys()
-		return DesktopUtils._executeRegistryScript(tmpRegScript)
-	}
-
-	/**
-	 * this will silently fail if we're not admin.
-	 * @param script: path to registry script
-	 * @private
-	 */
-	static _executeRegistryScript(script: string): Promise<void> {
-		const deferred = defer()
-		const file = DesktopUtils._writeToDisk(script, "reg")
-		spawn('reg.exe', ['import', file], {
-			stdio: ['ignore', 'inherit', 'inherit'],
-			detached: false
-		}).on('exit', (code, signal) => {
-			fs.unlinkSync(file)
-			if (code === 0) {
-				deferred.resolve()
-			} else {
-				deferred.reject(new Error("couldn't execute registry script"))
-			}
-		})
-		return deferred.promise
-	}
-
-	static _writeToDisk(contents: string, extension: string): string {
-		const filename = crypto.randomBytes(12).toString('hex') + "." + extension
-		console.log("Wrote file to ", filename)
-		const filePath = path.join(path.dirname(process.execPath), filename)
-		fs.writeFileSync(filePath, contents, {encoding: 'utf-8', mode: 0o400})
-
-		return filePath
 	}
 }
 
@@ -147,4 +85,78 @@ function checkForAdminStatus(): Promise<boolean> {
 			deferred.resolve(true)
 	}
 	return deferred.promise
+}
+
+/**
+ * Writes contents to the file filename into the directory of the executable
+ * @param filename
+ * @param contents
+ * @returns {*} path  to the written file
+ * @private
+ */
+function _writeToDisk(filename: string, contents: string): string {
+	console.log("Wrote file to ", filename)
+	const filePath = path.join(path.dirname(process.execPath), filename)
+	fs.writeFileSync(filePath, contents, {encoding: 'utf-8', mode: 0o400})
+	return filePath
+}
+
+/**
+ * uses the bundled elevate.exe to show a UAC dialog to the user and execute command with elevated permissions
+ * @param command
+ * @param args
+ * @returns {Promise<T>}
+ * @private
+ */
+function _elevateWin(command: string, args: Array<string>) {
+	const deferred = defer()
+	const elevateExe = path.join((process: any).resourcesPath, "elevate.exe")
+	let elevateArgs = ["-wait", command].concat(args)
+	spawn(elevateExe, elevateArgs, {
+		stdio: ['ignore', 'inherit', 'inherit'],
+		detached: false
+	}).on('exit', (code, signal) => {
+		console.log("code: ", code)
+		if (code === 0) {
+			deferred.resolve()
+		} else {
+			deferred.reject(new Error("couldn't elevate permissions"))
+		}
+	})
+	return deferred.promise
+}
+
+/**
+ * this will silently fail if we're not admin.
+ * @param script: path to registry script
+ * @private
+ */
+function _executeRegistryScript(script: string): Promise<void> {
+	const deferred = defer()
+	const file = _writeToDisk(crypto.randomBytes(12).toString('hex'), script)
+	spawn('reg.exe', ['import', file], {
+		stdio: ['ignore', 'inherit', 'inherit'],
+		detached: false
+	}).on('exit', (code, signal) => {
+		fs.unlinkSync(file)
+		if (code === 0) {
+			deferred.resolve()
+		} else {
+			deferred.reject(new Error("couldn't execute registry script"))
+		}
+	})
+	return deferred.promise
+}
+
+
+function _registerOnWin(): Promise<void> {
+	const tmpRegScript = require('./reg-templater.js').registerKeys(process.execPath)
+	return _executeRegistryScript(tmpRegScript)
+		.then(() => app.setAsDefaultProtocolClient('mailto'))
+}
+
+function _unregisterOnWin(): Promise<void> {
+	app.removeAsDefaultProtocolClient('mailto')
+	const tmpRegScript = require('./reg-templater.js').unregisterKeys()
+	return _executeRegistryScript(tmpRegScript)
 }

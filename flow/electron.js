@@ -20,6 +20,7 @@ declare module 'electron' {
 		constructor(any): BrowserWindow;
 		on(BrowserWindowEvent, (Event, ...Array<any>) => void): BrowserWindow;
 		focus(): void;
+		hide(): void;
 		restore(): void;
 		show(): void;
 		loadFile(string): void;
@@ -52,9 +53,10 @@ declare module 'electron' {
 		send(BridgeMessage, any): void;
 		session: ElectronSession;
 		getURL(): string;
-		openDevTools({|mode: string|}): void;
+		openDevTools(opts?: {|mode: string|}): void;
 		isDevToolsOpened(): boolean;
 		closeDevTools(): void;
+		toggleDevTools(): void;
 		reloadIgnoringCache(): void;
 	}
 
@@ -287,5 +289,6 @@ export type BridgeMessage
 	| 'editor-closed'   // editor was closed
 	| 'mailto'          // external navigation event
 	| 'webapp-ready'    // can start communication with webapp
+	| 'show-window'    // focus the browserWindow
 	| 'get-translations'// get all translations from the webapp
 

@@ -25,12 +25,8 @@ const main = () => {
 	notifier.start()
 	updater.start()
 	lang.init()
-	    .catch((e) => {
-		    console.log("error during lang init: ", e)
-		    throw e
-	    })
 	// .then(() => {
-	//    return DesktopNotifier
+	//    return notifier
 	//     .showOneShot({
 	// 	    title: lang.get('yearly_label'),
 	// 	    body: lang.get('amountUsedAndActivatedOf_label', {"{used}": 'nutzt', "{active}": 'aktiv', "{totalAmount}": 'max'}),

@@ -38,7 +38,7 @@ export class MainWindow {
 			}
 		})
 
-		IPC.init(this._browserWindow)
+		IPC.init(this)
 
 		// user clicked 'x' button
 		this._browserWindow
@@ -75,9 +75,18 @@ export class MainWindow {
 	}
 
 	show(mailtoArg: ?string) {
+		const contents = this._browserWindow.webContents
+		const devToolsState = contents.isDevToolsOpened()
 		if (this._browserWindow.isMinimized()) {
 			this._browserWindow.restore()
 			this._browserWindow.show()
+			//TODO: there has to be a better way
+			contents.toggleDevTools()
+			if (devToolsState) {
+				contents.openDevTools()
+			} else {
+				contents.closeDevTools()
+			}
 		} else {
 			this._browserWindow.focus()
 		}

@@ -1,5 +1,6 @@
 // @flow
-import {BrowserWindow, ipcMain} from 'electron'
+import {ipcMain} from 'electron'
+import {MainWindow} from './MainWindow'
 
 export default class IPC {
 
@@ -7,10 +8,14 @@ export default class IPC {
 	static _on = () => console.log("ipc not initialized!")
 	static _once = () => console.log("ipc not initialized!")
 
-	static init(window: BrowserWindow) {
-		IPC._send = (...args: any) => window.webContents.send.apply(window.webContents, args)
+	static init(window: MainWindow) {
+		IPC._send = (...args: any) => window._browserWindow.webContents.send.apply(window._browserWindow.webContents, args)
 		IPC._on = (...args: any) => ipcMain.on.apply(ipcMain, args)
 		IPC._once = (...args: any) => ipcMain.once.apply(ipcMain, args)
+
+		ipcMain.on('show-window', () => {
+			window.show()
+		})
 	}
 
 	static send(...args: any) {
