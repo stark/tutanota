@@ -36,5 +36,5 @@ const bridge: Bridge = {
 
 window.bridge = bridge
 window.focus = () => {
-	ipcRenderer.send('focus-window')
+	ipcRenderer.send('show-window')
 }

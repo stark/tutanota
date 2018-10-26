@@ -10,7 +10,9 @@ function _showNotification(title: string, options: ?NotificationOptions): ?Notif
 			const actualOptions: NotificationOptions = Object.assign({}, {
 				icon: NotificationIcon
 			}, options)
-			return new Notification(title, actualOptions)
+			const notification = new Notification(title, actualOptions)
+			notification.onclick = (options: any).onclick
+			return notification
 		} catch (e) {
 			// new Notification() throws an error in new chrome browsers on android devices.
 			// According to the error message ServiceWorkerRegistration.showNotification() should be used instead.
